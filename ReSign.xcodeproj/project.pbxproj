@@ -1,0 +1,423 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		RS0001 /* ReSignApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0002 /* ReSignApp.swift */; };
+		RS0003 /* ManagedProject.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0004 /* ManagedProject.swift */; };
+		RS0005 /* BuildResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0006 /* BuildResult.swift */; };
+		RS0007 /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0008 /* DeviceInfo.swift */; };
+		RS0009 /* ProjectDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0010 /* ProjectDiscovery.swift */; };
+		RS0011 /* ProjectStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0012 /* ProjectStore.swift */; };
+		RS0013 /* BuildRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0014 /* BuildRunner.swift */; };
+		RS0015 /* DeviceLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0016 /* DeviceLocator.swift */; };
+		RS0017 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0018 /* Scheduler.swift */; };
+		RS0019 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0020 /* NotificationManager.swift */; };
+		RS0021 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0022 /* MenuBarView.swift */; };
+		RS0023 /* ProjectRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0024 /* ProjectRowView.swift */; };
+		RS0025 /* StatusIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0026 /* StatusIconView.swift */; };
+		RS0027 /* DateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0028 /* DateHelpers.swift */; };
+		RS0029 /* BuildLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0030 /* BuildLogStore.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		RS0002 /* ReSignApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReSignApp.swift; sourceTree = "<group>"; };
+		RS0004 /* ManagedProject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedProject.swift; sourceTree = "<group>"; };
+		RS0006 /* BuildResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildResult.swift; sourceTree = "<group>"; };
+		RS0008 /* DeviceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
+		RS0010 /* ProjectDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDiscovery.swift; sourceTree = "<group>"; };
+		RS0012 /* ProjectStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectStore.swift; sourceTree = "<group>"; };
+		RS0014 /* BuildRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildRunner.swift; sourceTree = "<group>"; };
+		RS0016 /* DeviceLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceLocator.swift; sourceTree = "<group>"; };
+		RS0018 /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
+		RS0020 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		RS0022 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		RS0024 /* ProjectRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectRowView.swift; sourceTree = "<group>"; };
+		RS0026 /* StatusIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusIconView.swift; sourceTree = "<group>"; };
+		RS0028 /* DateHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateHelpers.swift; sourceTree = "<group>"; };
+		RS0030 /* BuildLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildLogStore.swift; sourceTree = "<group>"; };
+		RS0060 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		RS0061 /* ReSign.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ReSign.entitlements; sourceTree = "<group>"; };
+		RS0070 /* ReSign.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReSign.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		RS0080 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		RS0100 = {
+			isa = PBXGroup;
+			children = (
+				RS0101 /* Sources */,
+				RS0107 /* Root */,
+				RS0102 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		RS0101 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				RS0002 /* ReSignApp.swift */,
+				RS0103 /* Models */,
+				RS0104 /* Services */,
+				RS0105 /* Views */,
+				RS0106 /* Utilities */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		RS0102 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				RS0070 /* ReSign.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		RS0103 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				RS0004 /* ManagedProject.swift */,
+				RS0006 /* BuildResult.swift */,
+				RS0008 /* DeviceInfo.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		RS0104 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				RS0010 /* ProjectDiscovery.swift */,
+				RS0012 /* ProjectStore.swift */,
+				RS0014 /* BuildRunner.swift */,
+				RS0016 /* DeviceLocator.swift */,
+				RS0018 /* Scheduler.swift */,
+				RS0020 /* NotificationManager.swift */,
+				RS0030 /* BuildLogStore.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		RS0105 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				RS0022 /* MenuBarView.swift */,
+				RS0024 /* ProjectRowView.swift */,
+				RS0026 /* StatusIconView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		RS0106 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				RS0028 /* DateHelpers.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		RS0107 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				RS0060 /* Info.plist */,
+				RS0061 /* ReSign.entitlements */,
+			);
+			name = Root;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		RS0200 /* ReSign */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = RS0300 /* Build configuration list for PBXNativeTarget "ReSign" */;
+			buildPhases = (
+				RS0201 /* Sources */,
+				RS0080 /* Frameworks */,
+				RS0202 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ReSign;
+			productName = ReSign;
+			productReference = RS0070 /* ReSign.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		RS0400 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					RS0200 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = RS0500 /* Build configuration list for PBXProject "ReSign" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = RS0100;
+			productRefGroup = RS0102 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				RS0200 /* ReSign */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		RS0202 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		RS0201 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				RS0001 /* ReSignApp.swift in Sources */,
+				RS0003 /* ManagedProject.swift in Sources */,
+				RS0005 /* BuildResult.swift in Sources */,
+				RS0007 /* DeviceInfo.swift in Sources */,
+				RS0009 /* ProjectDiscovery.swift in Sources */,
+				RS0011 /* ProjectStore.swift in Sources */,
+				RS0013 /* BuildRunner.swift in Sources */,
+				RS0015 /* DeviceLocator.swift in Sources */,
+				RS0017 /* Scheduler.swift in Sources */,
+				RS0019 /* NotificationManager.swift in Sources */,
+				RS0021 /* MenuBarView.swift in Sources */,
+				RS0023 /* ProjectRowView.swift in Sources */,
+				RS0025 /* StatusIconView.swift in Sources */,
+				RS0027 /* DateHelpers.swift in Sources */,
+				RS0029 /* BuildLogStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		RS0301 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_ENTITLEMENTS = ReSign.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 35DGVFM7WB;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_TESTABILITY = YES;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alejandro.ReSign;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		RS0302 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_ENTITLEMENTS = ReSign.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 35DGVFM7WB;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alejandro.ReSign;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		RS0501 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		RS0502 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		RS0300 /* Build configuration list for PBXNativeTarget "ReSign" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				RS0301 /* Debug */,
+				RS0302 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		RS0500 /* Build configuration list for PBXProject "ReSign" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				RS0501 /* Debug */,
+				RS0502 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = RS0400 /* Project object */;
+}
