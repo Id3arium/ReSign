@@ -127,18 +127,30 @@ enum BuildRunner {
     }
 
     private static func classifyBuildError(_ output: String) -> String {
-        if output.contains("SIGNING") || output.contains("provisioning") {
-            return "Signing error. Open Xcode and verify your team is selected."
+        if output.contains("No Accounts") {
+            return "Not signed in to Xcode. Open Xcode → Settings → Accounts and sign in with your Apple ID, then try again."
+        }
+        if output.contains("No profiles for") || output.contains("no provisioning profiles") {
+            return "No provisioning profile found. Open Xcode, sign in under Settings → Accounts, and build the project once manually to create a profile."
+        }
+        if output.contains("provisioning profile") && output.contains("expired") {
+            return "Provisioning profile expired. Open Xcode → Settings → Accounts → Manage Certificates to renew."
+        }
+        if output.contains("SIGNING") || output.contains("code sign") || output.contains("CodeSign") {
+            return "Code signing failed. Open Xcode, select your team under Signing & Capabilities, and verify the bundle ID matches your profile."
         }
         if output.contains("Build input file cannot be found") {
-            return "Source file missing. Check the project in Xcode."
+            return "Source file missing. Check the project for broken file references in Xcode."
+        }
+        if output.contains("could not find module") {
+            return "Missing Swift module or dependency. Try cleaning derived data or resolving packages in Xcode."
         }
         // Extract last error: line
         let lines = output.components(separatedBy: "\n")
         if let errorLine = lines.last(where: { $0.contains("error:") }) {
             return String(errorLine.prefix(200))
         }
-        return "Build failed. Check logs for details."
+        return "Build failed. Check the build log for details."
     }
 
     private static func run(
