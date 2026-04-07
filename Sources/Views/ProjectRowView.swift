@@ -24,10 +24,10 @@ struct ProjectRowView: View {
             Spacer()
 
             if project.isBuilding {
-                HStack(spacing: 6) {
+                HStack(spacing: 10) {
                     ProgressView()
-                        .scaleEffect(0.7)
-                        .frame(width: 16, height: 16)
+                        .scaleEffect(0.55)
+                        .frame(width: 14, height: 14)
 
                     Button {
                         onCancel()
@@ -45,7 +45,7 @@ struct ProjectRowView: View {
                     .controlSize(.mini)
             }
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, 16)
         .padding(.vertical, 8)
     }
 

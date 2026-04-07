@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A9C2E9E72F83528B002FA000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A9C2E9E62F83528B002FA000 /* Assets.xcassets */; };
 		RS0001 /* ReSignApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0002 /* ReSignApp.swift */; };
 		RS0003 /* ManagedProject.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0004 /* ManagedProject.swift */; };
 		RS0005 /* BuildResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0006 /* BuildResult.swift */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A9C2E9E62F83528B002FA000 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		RS0002 /* ReSignApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReSignApp.swift; sourceTree = "<group>"; };
 		RS0004 /* ManagedProject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedProject.swift; sourceTree = "<group>"; };
 		RS0006 /* BuildResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildResult.swift; sourceTree = "<group>"; };
@@ -73,6 +75,7 @@
 				RS0104 /* Services */,
 				RS0105 /* Views */,
 				RS0106 /* Utilities */,
+				A9C2E9E62F83528B002FA000 /* Assets.xcassets */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -194,6 +197,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9C2E9E72F83528B002FA000 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -23,7 +23,7 @@ struct MenuBarView: View {
                 }
 
                 HeaderButton(
-                    icon: showSettings ? "xmark" : "gear",
+                    icon: showSettings ? "arrow.left" : "gear",
                     help: showSettings ? "Back to projects" : "Settings"
                 ) {
                     withAnimation(.easeInOut(duration: 0.15)) {
@@ -33,7 +33,7 @@ struct MenuBarView: View {
                 }
             }
             .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            .padding(.vertical, 8)
 
             Divider()
 

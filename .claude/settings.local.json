@@ -4,7 +4,8 @@
       "Bash(xcodebuild -scheme ReSign -configuration Debug build)",
       "Bash(xcodebuild -scheme ReSign -configuration Debug build CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY=\"\")",
       "Bash(swift build:*)",
-      "Bash(xcodebuild -project ReSign.xcodeproj -scheme ReSign -destination \"platform=macOS\" build)"
+      "Bash(xcodebuild -project ReSign.xcodeproj -scheme ReSign -destination \"platform=macOS\" build)",
+      "Bash(chmod +x /Users/alejandro/Projects/Code/walled_garden/ReSign/build.sh)"
     ]
   }
 }
