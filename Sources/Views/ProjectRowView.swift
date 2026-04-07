@@ -40,7 +40,7 @@ struct ProjectRowView: View {
                 }
                 .frame(height: 28)
             } else {
-                Button("Build Now", action: onBuildNow)
+                Button("Rebuild", action: onBuildNow)
                     .buttonStyle(.borderedProminent)
                     .controlSize(.mini)
             }
@@ -50,10 +50,10 @@ struct ProjectRowView: View {
     }
 
     private var statusColor: Color {
-        if project.isBuilding { return .blue }
-        if project.lastError != nil { return .red }
-        if project.isDue { return .orange }
-        return .green
+        if project.isBuilding { return .blue.opacity(0.9) }
+        if project.lastError != nil { return .red.opacity(0.9) }
+        if project.isDue { return .orange.opacity(0.9) }
+        return .green.opacity(0.9)
     }
 
     private var statusLabel: String {

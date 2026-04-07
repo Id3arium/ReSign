@@ -8,16 +8,14 @@ struct StatusIconView: View {
         if let nsImage = NSImage(named: "MenuBarIcon") {
             let tinted = nsImage.tinted(with: NSColor(iconColor))
             Image(nsImage: tinted)
-                .resizable()
-                .frame(width: 18, height: 18)
         }
     }
 
     private var iconColor: Color {
-        if store.projects.contains(where: { $0.isBuilding }) { return .yellow }
-        if store.projects.contains(where: { $0.lastError != nil }) { return .red }
-        if store.projects.contains(where: { $0.isDue }) { return .orange }
-        return .green
+        if store.projects.contains(where: { $0.isBuilding }) { return .blue.opacity(0.8) }
+        if store.projects.contains(where: { $0.lastError != nil }) { return .red.opacity(0.8) }
+        if store.projects.contains(where: { $0.isDue }) { return .orange.opacity(0.8) }
+        return .green.opacity(0.8)
     }
 }
 
