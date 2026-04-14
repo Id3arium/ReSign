@@ -48,7 +48,7 @@ final class ProjectStore {
             $0.lastBuiltAt = .now
             $0.lastError = nil
             $0.buildPhase = nil
-            if let profileExpiresAt { $0.profileExpiresAt = profileExpiresAt }
+            $0.profileExpiresAt = profileExpiresAt
         }
         save()
     }

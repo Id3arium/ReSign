@@ -77,7 +77,7 @@ final class Scheduler {
         guard let project = store.projects.first(where: { $0.id == id }) else { return }
 
         store.markBuildStarted(id: id)
-        logStore?.clearLog(for: id)
+        logStore?.clearLog(for: id, name: project.name)
 
         let task = Task { [weak self] in
             let preferredDeviceID = UserDefaults.standard.string(forKey: "selectedDeviceID")

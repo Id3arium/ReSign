@@ -71,39 +71,59 @@ struct MenuBarView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     ForEach(store.projects) { project in
-                        VStack(spacing: 0) {
-                            ProjectRowView(project: project) {
-                                scheduler.checkNow(for: project.id)
-                            } onCancel: {
-                                scheduler.cancelBuild(for: project.id)
-                            }
-
-                            // Expandable log viewer
-                            if expandedLogID == project.id, let log = allLogs[project.id], !log.isEmpty {
-                                ScrollView {
-                                    Text(log)
-                                        .font(.system(.caption2, design: .monospaced))
-                                        .textSelection(.enabled)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(8)
+                        ProjectCardRow(
+                            project: project,
+                            log: allLogs[project.id],
+                            isExpanded: expandedLogID == project.id,
+                            onRebuild: { scheduler.checkNow(for: project.id) },
+                            onCancel: { scheduler.cancelBuild(for: project.id) },
+                            onTap: {
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    expandedLogID = expandedLogID == project.id ? nil : project.id
                                 }
-                                .frame(maxHeight: 140)
-                                .background(.black.opacity(0.05))
                             }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                expandedLogID = expandedLogID == project.id ? nil : project.id
-                            }
-                        }
-
+                        )
                         Divider()
                     }
                 }
             }
             .frame(maxHeight: 320)
         }
+    }
+}
+
+// MARK: - Project Card Row
+
+private struct ProjectCardRow: View {
+    let project: ManagedProject
+    let log: String?
+    let isExpanded: Bool
+    let onRebuild: () -> Void
+    let onCancel: () -> Void
+    let onTap: () -> Void
+
+    @State private var isHovered = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ProjectRowView(project: project, onBuildNow: onRebuild, onCancel: onCancel)
+
+            if isExpanded, let log, !log.isEmpty {
+                ScrollView {
+                    Text(log)
+                        .font(.system(.caption2, design: .monospaced))
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                }
+                .frame(maxHeight: 140)
+                .background(.black.opacity(0.05))
+            }
+        }
+        .background(isHovered ? Color.primary.opacity(0.06) : Color.clear)
+        .contentShape(Rectangle())
+        .onHover { isHovered = $0 }
+        .onTapGesture { onTap() }
     }
 }
 

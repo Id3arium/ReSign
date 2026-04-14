@@ -33,8 +33,10 @@ final class BuildLogStore {
         }
     }
 
-    func clearLog(for projectID: UUID) {
+    func clearLog(for projectID: UUID, name: String) {
         logs[projectID] = nil
+        let file = logsDirectory.appendingPathComponent("\(name).log")
+        try? FileManager.default.removeItem(at: file)
     }
 
     func log(for projectID: UUID) -> String? {

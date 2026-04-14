@@ -33,9 +33,6 @@ enum BuildRunner {
             return (.cancelled, fullLog.value)
         }
 
-        let derivedDataPath = derivedDataURL(for: project)
-        try? FileManager.default.createDirectory(at: derivedDataPath, withIntermediateDirectories: true)
-
         append("=== xcodebuild ===\n")
         let buildResult: (output: String, exitCode: Int32)
         do {
@@ -44,7 +41,6 @@ enum BuildRunner {
                 "-project", project.projectPath.path,
                 "-scheme", project.name,
                 "-destination", "generic/platform=iOS",
-                "-derivedDataPath", derivedDataPath.path,
                 "-allowProvisioningUpdates",
                 "clean", "build"
             ], onOutput: append)
@@ -58,11 +54,8 @@ enum BuildRunner {
             return (.failure(phase: .xcodebuild, message: classifyBuildError(buildResult.output)), fullLog.value)
         }
 
-        let appPath = derivedDataPath
-            .appendingPathComponent("Build/Products/Debug-iphoneos/\(project.name).app")
-
-        guard FileManager.default.fileExists(atPath: appPath.path) else {
-            return (.failure(phase: .xcodebuild, message: "Build succeeded but .app bundle not found at expected path."), fullLog.value)
+        guard let appPath = findAppBundle(in: buildResult.output, projectName: project.name) else {
+            return (.failure(phase: .xcodebuild, message: "Build succeeded but .app bundle not found. Check build log for the output path."), fullLog.value)
         }
 
         // Phase 3: Install
@@ -120,10 +113,35 @@ enum BuildRunner {
         return expirationDate
     }
 
-    private static func derivedDataURL(for project: ManagedProject) -> URL {
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return appSupport
-            .appendingPathComponent("ReSign/DerivedData/\(project.name)", isDirectory: true)
+    /// Extracts the .app bundle path from xcodebuild output.
+    /// xcodebuild emits a line like: "CODESIGNING_FOLDER_PATH = /path/to/App.app"
+    private static func findAppBundle(in output: String, projectName: String) -> URL? {
+        let lines = output.components(separatedBy: "\n")
+        for line in lines {
+            if line.contains("CODESIGNING_FOLDER_PATH") || line.contains("TARGET_BUILD_DIR"),
+               let range = line.range(of: "/"),
+               line.hasSuffix(".app") || line.contains(".app/") {
+                let path = String(line[range.lowerBound...]).trimmingCharacters(in: .whitespaces)
+                let url = URL(filePath: path)
+                if FileManager.default.fileExists(atPath: url.path) { return url }
+            }
+        }
+        // Fallback: search Xcode's default DerivedData for a matching .app
+        let xcodeDerivedData = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Developer/Xcode/DerivedData")
+        if let enumerator = FileManager.default.enumerator(
+            at: xcodeDerivedData,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        ) {
+            for case let url as URL in enumerator {
+                if url.lastPathComponent == "\(projectName).app",
+                   url.pathComponents.contains("iphoneos") {
+                    return url
+                }
+            }
+        }
+        return nil
     }
 
     private static func classifyBuildError(_ output: String) -> String {

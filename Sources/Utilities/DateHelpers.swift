@@ -13,7 +13,7 @@ enum DateHelpers {
     }
 
     static func expiryDate(from buildDate: Date) -> String {
-        let expiry = Calendar.current.date(byAdding: .day, value: 7, to: buildDate) ?? buildDate
+        let expiry = Calendar.current.date(byAdding: .day, value: 6, to: buildDate) ?? buildDate
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d"
         return formatter.string(from: expiry)
