@@ -25,6 +25,9 @@ final class ProjectStore {
         let scanRoot = URL(filePath: path)
         let discovered = try ProjectDiscovery.discoverProjects(in: scanRoot)
 
+        // Guard: if scan returned nothing, don't wipe existing projects
+        guard !discovered.isEmpty else { return }
+
         // Keep existing state for known projects, add new ones
         var updated: [ManagedProject] = []
         for discovered in discovered {

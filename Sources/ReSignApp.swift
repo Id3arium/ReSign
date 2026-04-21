@@ -4,14 +4,9 @@ import SwiftUI
 struct ReSignApp: App {
     @State private var store = ProjectStore()
     @State private var logStore = BuildLogStore()
-    private let scheduler = Scheduler()
-    private let notifications = NotificationManager()
-
-    init() {
-        notifications.requestPermission()
-        scheduler.start(store: store, notifications: notifications, logStore: logStore)
-        logStore.loadAll(projects: store.projects)
-    }
+    @State private var scheduler = Scheduler()
+    @State private var notifications = NotificationManager()
+    @State private var didStart = false
 
     var body: some Scene {
         MenuBarExtra {
@@ -20,6 +15,13 @@ struct ReSignApp: App {
                 .environment(logStore)
         } label: {
             StatusIconView(store: store)
+                .task {
+                    guard !didStart else { return }
+                    didStart = true
+                    notifications.requestPermission()
+                    logStore.loadAll(projects: store.projects)
+                    scheduler.start(store: store, notifications: notifications, logStore: logStore)
+                }
         }
         .menuBarExtraStyle(.window)
     }

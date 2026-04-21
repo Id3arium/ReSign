@@ -47,7 +47,7 @@ enum BuildRunner {
         } catch is CancellationError {
             return (.cancelled, fullLog.value)
         } catch {
-            return (.cancelled, fullLog.value)
+            return (.failure(phase: .xcodebuild, message: error.localizedDescription), fullLog.value)
         }
 
         guard buildResult.exitCode == 0 else {
@@ -76,7 +76,7 @@ enum BuildRunner {
         } catch is CancellationError {
             return (.cancelled, fullLog.value)
         } catch {
-            return (.cancelled, fullLog.value)
+            return (.failure(phase: .deviceInstall, message: error.localizedDescription), fullLog.value)
         }
 
         guard installResult.exitCode == 0 else {
