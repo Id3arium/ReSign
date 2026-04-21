@@ -33,6 +33,14 @@ enum BuildRunner {
             return (.cancelled, fullLog.value)
         }
 
+        // Use a per-project derived data dir so we know exactly where the .app lands.
+        let derivedDataDir = derivedDataDirectory(for: project)
+        do {
+            try FileManager.default.createDirectory(at: derivedDataDir, withIntermediateDirectories: true)
+        } catch {
+            return (.failure(phase: .xcodebuild, message: "Could not create build output directory at \(derivedDataDir.path). Check disk permissions."), fullLog.value)
+        }
+
         append("=== xcodebuild ===\n")
         let buildResult: (output: String, exitCode: Int32)
         do {
@@ -40,7 +48,9 @@ enum BuildRunner {
                 "xcodebuild",
                 "-project", project.projectPath.path,
                 "-scheme", project.name,
+                "-configuration", "Debug",
                 "-destination", "generic/platform=iOS",
+                "-derivedDataPath", derivedDataDir.path,
                 "-allowProvisioningUpdates",
                 "clean", "build"
             ], onOutput: append)
@@ -54,8 +64,10 @@ enum BuildRunner {
             return (.failure(phase: .xcodebuild, message: classifyBuildError(buildResult.output)), fullLog.value)
         }
 
-        guard let appPath = findAppBundle(in: buildResult.output, projectName: project.name) else {
-            return (.failure(phase: .xcodebuild, message: "Build succeeded but .app bundle not found. Check build log for the output path."), fullLog.value)
+        let productsDir = derivedDataDir
+            .appendingPathComponent("Build/Products/Debug-iphoneos", isDirectory: true)
+        guard let appPath = findAppBundle(in: productsDir) else {
+            return (.failure(phase: .xcodebuild, message: "Build reported success but no .app was produced at \(productsDir.path). Try building the scheme manually in Xcode to see what's happening."), fullLog.value)
         }
 
         // Phase 3: Install
@@ -113,35 +125,30 @@ enum BuildRunner {
         return expirationDate
     }
 
-    /// Extracts the .app bundle path from xcodebuild output.
-    /// xcodebuild emits a line like: "CODESIGNING_FOLDER_PATH = /path/to/App.app"
-    private static func findAppBundle(in output: String, projectName: String) -> URL? {
-        let lines = output.components(separatedBy: "\n")
-        for line in lines {
-            if line.contains("CODESIGNING_FOLDER_PATH") || line.contains("TARGET_BUILD_DIR"),
-               let range = line.range(of: "/"),
-               line.hasSuffix(".app") || line.contains(".app/") {
-                let path = String(line[range.lowerBound...]).trimmingCharacters(in: .whitespaces)
-                let url = URL(filePath: path)
-                if FileManager.default.fileExists(atPath: url.path) { return url }
-            }
-        }
-        // Fallback: search Xcode's default DerivedData for a matching .app
-        let xcodeDerivedData = FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Library/Developer/Xcode/DerivedData")
-        if let enumerator = FileManager.default.enumerator(
-            at: xcodeDerivedData,
-            includingPropertiesForKeys: [.isDirectoryKey],
+    /// Per-project derived data directory. Keyed by project UUID so rebuilds are deterministic
+    /// and we don't pollute the user's ~/Library/Developer/Xcode/DerivedData.
+    private static func derivedDataDirectory(for project: ManagedProject) -> URL {
+        FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Caches/ReSign/DerivedData", isDirectory: true)
+            .appendingPathComponent(project.id.uuidString, isDirectory: true)
+    }
+
+    /// Finds the built .app inside our controlled products directory.
+    /// Picks the most recently modified .app in case multiple targets produced one.
+    private static func findAppBundle(in productsDir: URL) -> URL? {
+        let fm = FileManager.default
+        guard let entries = try? fm.contentsOfDirectory(
+            at: productsDir,
+            includingPropertiesForKeys: [.contentModificationDateKey],
             options: [.skipsHiddenFiles]
-        ) {
-            for case let url as URL in enumerator {
-                if url.lastPathComponent == "\(projectName).app",
-                   url.pathComponents.contains("iphoneos") {
-                    return url
-                }
-            }
+        ) else { return nil }
+
+        let apps = entries.filter { $0.pathExtension == "app" }
+        return apps.max { a, b in
+            let da = (try? a.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+            let db = (try? b.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+            return da < db
         }
-        return nil
     }
 
     private static func classifyBuildError(_ output: String) -> String {

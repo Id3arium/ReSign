@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct MenuBarView: View {
     @Environment(ProjectStore.self) private var store
@@ -118,12 +119,47 @@ private struct ProjectCardRow: View {
                 }
                 .frame(maxHeight: 140)
                 .background(.black.opacity(0.05))
+                .overlay(alignment: .topTrailing) {
+                    CopyLogButton(log: log)
+                        .padding(6)
+                }
             }
         }
         .background(isHovered ? Color.primary.opacity(0.06) : Color.clear)
         .contentShape(Rectangle())
         .onHover { isHovered = $0 }
         .onTapGesture { onTap() }
+    }
+}
+
+// MARK: - Copy Log Button
+
+private struct CopyLogButton: View {
+    let log: String
+    @State private var justCopied = false
+
+    var body: some View {
+        Button {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(log, forType: .string)
+            justCopied = true
+            Task {
+                try? await Task.sleep(for: .milliseconds(1200))
+                justCopied = false
+            }
+        } label: {
+            Image(systemName: justCopied ? "checkmark" : "doc.on.doc")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(justCopied ? Color.green : Color.primary.opacity(0.7))
+                .padding(5)
+                .background(.background.opacity(0.8), in: RoundedRectangle(cornerRadius: 5))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5)
+                        .strokeBorder(Color.primary.opacity(0.15), lineWidth: 0.5)
+                )
+        }
+        .buttonStyle(.plain)
+        .help(justCopied ? "Copied" : "Copy log")
     }
 }
 
