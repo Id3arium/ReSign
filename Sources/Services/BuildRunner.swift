@@ -191,23 +191,33 @@ enum BuildRunner {
         process.standardOutput = stdoutPipe
         process.standardError = stderrPipe
 
-        // Accumulate full output for return value
+        // Accumulate full (filtered) output for return value
         let outputAccumulator = OutputAccumulator()
 
-        // Stream stdout in real-time
+        // Single shared filter instance; it's stateful across chunks (tracks
+        // which step header we're inside of). Wrapped for thread-safety since
+        // stdout and stderr handlers may fire on different queues.
+        let filter = FilterBox()
+
+        let emit: @Sendable (String) -> Void = { raw in
+            let compact = filter.feed(raw)
+            guard !compact.isEmpty else { return }
+            outputAccumulator.append(compact)
+            onOutput(compact)
+        }
+
+        // Stream stdout in real-time (filtered)
         stdoutPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
             guard !data.isEmpty, let text = String(data: data, encoding: .utf8) else { return }
-            outputAccumulator.append(text)
-            onOutput(text)
+            emit(text)
         }
 
-        // Stream stderr in real-time
+        // Stream stderr in real-time (filtered)
         stderrPipe.fileHandleForReading.readabilityHandler = { handle in
             let data = handle.availableData
             guard !data.isEmpty, let text = String(data: data, encoding: .utf8) else { return }
-            outputAccumulator.append(text)
-            onOutput(text)
+            emit(text)
         }
 
         return try await withTaskCancellationHandler {
@@ -217,12 +227,18 @@ enum BuildRunner {
                     stdoutPipe.fileHandleForReading.readabilityHandler = nil
                     stderrPipe.fileHandleForReading.readabilityHandler = nil
 
-                    // Read any remaining data
+                    // Read any remaining data (filtered)
                     if let remaining = String(data: stdoutPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8), !remaining.isEmpty {
-                        outputAccumulator.append(remaining)
+                        emit(remaining)
                     }
                     if let remaining = String(data: stderrPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8), !remaining.isEmpty {
-                        outputAccumulator.append(remaining)
+                        emit(remaining)
+                    }
+                    // Flush any trailing partial line the filter was buffering.
+                    let tail = filter.flush()
+                    if !tail.isEmpty {
+                        outputAccumulator.append(tail)
+                        onOutput(tail)
                     }
 
                     let output = outputAccumulator.value
@@ -242,6 +258,25 @@ enum BuildRunner {
         } onCancel: {
             process.terminate()
         }
+    }
+}
+
+/// Thread-safe wrapper around BuildOutputFilter. Pipe readability handlers
+/// can fire on different queues (stdout vs stderr), so we serialize access.
+private final class FilterBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private let filter = BuildOutputFilter()
+
+    func feed(_ chunk: String) -> String {
+        lock.lock()
+        defer { lock.unlock() }
+        return filter.feed(chunk)
+    }
+
+    func flush() -> String {
+        lock.lock()
+        defer { lock.unlock() }
+        return filter.flush()
     }
 }
 
