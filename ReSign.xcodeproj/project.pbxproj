@@ -23,6 +23,7 @@
 		RS0025 /* StatusIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0026 /* StatusIconView.swift */; };
 		RS0027 /* DateHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0028 /* DateHelpers.swift */; };
 		RS0029 /* BuildLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0030 /* BuildLogStore.swift */; };
+		RS0031 /* SigningStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0032 /* SigningStatus.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		RS0026 /* StatusIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusIconView.swift; sourceTree = "<group>"; };
 		RS0028 /* DateHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateHelpers.swift; sourceTree = "<group>"; };
 		RS0030 /* BuildLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildLogStore.swift; sourceTree = "<group>"; };
+		RS0032 /* SigningStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigningStatus.swift; sourceTree = "<group>"; };
 		RS0060 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		RS0061 /* ReSign.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ReSign.entitlements; sourceTree = "<group>"; };
 		RS0070 /* ReSign.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReSign.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,6 +110,7 @@
 				RS0018 /* Scheduler.swift */,
 				RS0020 /* NotificationManager.swift */,
 				RS0030 /* BuildLogStore.swift */,
+				RS0032 /* SigningStatus.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -223,6 +226,7 @@
 				RS0025 /* StatusIconView.swift in Sources */,
 				RS0027 /* DateHelpers.swift in Sources */,
 				RS0029 /* BuildLogStore.swift in Sources */,
+				RS0031 /* SigningStatus.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

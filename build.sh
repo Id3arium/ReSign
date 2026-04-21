@@ -99,12 +99,23 @@ if [ "$MODE" = "fast" ]; then
     if pgrep -f "$BUILD_PATTERN" >/dev/null; then
         echo "→ Stopping previous ./build instance"
         pkill -f "$BUILD_PATTERN" 2>/dev/null || true
-        # Wait up to 3s for exit
+        # Wait up to 3s for graceful exit
         for _ in 1 2 3 4 5 6; do
             pgrep -f "$BUILD_PATTERN" >/dev/null || break
             sleep 0.5
         done
-        pkill -9 -f "$BUILD_PATTERN" 2>/dev/null || true
+        # Force-kill any stragglers
+        if pgrep -f "$BUILD_PATTERN" >/dev/null; then
+            pkill -9 -f "$BUILD_PATTERN" 2>/dev/null || true
+        fi
+        # Poll until the process is truly gone — avoids LaunchServices -600
+        # ("app still registered") on the subsequent `open`.
+        for _ in 1 2 3 4 5 6 7 8; do
+            pgrep -f "$BUILD_PATTERN" >/dev/null || break
+            sleep 0.25
+        done
+        # Small extra beat for LaunchServices to deregister the old bundle.
+        sleep 0.5
     fi
 
     echo "→ Launching $APP_PATH"

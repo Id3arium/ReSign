@@ -55,6 +55,14 @@ struct MenuBarView: View {
             .padding(.vertical, 10)
         }
         .frame(width: 300)
+        .onHover { inside in
+            // macOS sometimes shows a resize cursor over dividers / scroll
+            // edges in a MenuBarExtra window. Force the arrow cursor while
+            // hovering anywhere in the popup.
+            if inside {
+                NSCursor.arrow.set()
+            }
+        }
     }
 
     // MARK: - Projects
@@ -121,7 +129,8 @@ private struct ProjectCardRow: View {
                 .background(.black.opacity(0.05))
                 .overlay(alignment: .topTrailing) {
                     CopyLogButton(log: log)
-                        .padding(6)
+                        .padding(.top, 6)
+                        .padding(.trailing, 18)
                 }
             }
         }

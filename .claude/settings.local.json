@@ -7,7 +7,8 @@
       "Bash(xcodebuild -project ReSign.xcodeproj -scheme ReSign -destination \"platform=macOS\" build)",
       "Bash(chmod +x /Users/alejandro/Projects/Code/walled_garden/ReSign/build.sh)",
       "Bash(xcodebuild -project ReSign.xcodeproj -scheme ReSign -configuration Debug -destination 'platform=macOS' build)",
-      "Bash(./build.sh)"
+      "Bash(./build.sh)",
+      "Bash(open /Users/alejandro/Projects/Code/walled_garden/ReSign/build/DerivedData/Build/Products/Debug/ReSign.app)"
     ]
   }
 }
