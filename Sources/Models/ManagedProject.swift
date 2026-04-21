@@ -9,11 +9,19 @@ struct ManagedProject: Identifiable, Codable {
     var profileExpiresAt: Date?
     var isBuilding: Bool = false
     var buildPhase: String?
+    /// Set when the most recent rebuild succeeded but Apple returned the same
+    /// provisioning profile (expiry didn't advance). The build itself is fine;
+    /// this surfaces "Apple said meh, rerun in Xcode or try again later."
+    var stuckOnOldProfile: Bool = false
 
     var nextDueAt: Date? {
         if let profileExpiresAt {
-            // Rebuild 1 day before the profile actually expires
-            return Calendar.current.date(byAdding: .day, value: -1, to: profileExpiresAt)
+            // Rebuild 2 hours before the profile actually expires. We used to
+            // use 1 day, but free-tier profiles are only valid for 7 days and
+            // Apple often won't issue a fresh one until the old one is nearly
+            // gone — so a wider threshold just keeps the UI yellow all day
+            // for nothing. 2h is "practically expired, do it now".
+            return Calendar.current.date(byAdding: .hour, value: -2, to: profileExpiresAt)
         }
         guard let last = lastBuiltAt else { return .now }
         return Calendar.current.date(byAdding: .day, value: 6, to: last)
@@ -45,6 +53,6 @@ struct ManagedProject: Identifiable, Codable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, projectPath, lastBuiltAt, lastError, profileExpiresAt
+        case id, name, projectPath, lastBuiltAt, lastError, profileExpiresAt, stuckOnOldProfile
     }
 }

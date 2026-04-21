@@ -47,6 +47,17 @@ final class ProjectStore {
 
     func markBuildSucceeded(id: UUID, profileExpiresAt: Date? = nil) {
         update(id: id) {
+            // "Stuck" means: we got a fresh build, but Apple handed back the same
+            // (or an older) provisioning profile, so nothing actually bought us
+            // more runtime on-device. Detect by comparing against the previous
+            // expiry; tolerate a ~60s clock-skew nudge so trivially-same
+            // timestamps don't also count as "advanced".
+            if let new = profileExpiresAt, let old = $0.profileExpiresAt {
+                $0.stuckOnOldProfile = new <= old.addingTimeInterval(60)
+            } else {
+                $0.stuckOnOldProfile = false
+            }
+
             $0.isBuilding = false
             $0.lastBuiltAt = .now
             $0.lastError = nil

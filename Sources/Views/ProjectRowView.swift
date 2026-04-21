@@ -53,6 +53,9 @@ struct ProjectRowView: View {
         if project.isBuilding { return .blue.opacity(0.9) }
         if project.lastError != nil { return .red.opacity(0.9) }
         if project.isDue { return .orange.opacity(0.9) }
+        // Built successfully but Apple reused the old profile — show a muted
+        // yellow so it's visually distinct from "green, all good".
+        if project.stuckOnOldProfile { return .yellow.opacity(0.8) }
         return .green.opacity(0.9)
     }
 
@@ -61,6 +64,9 @@ struct ProjectRowView: View {
         if let error = project.lastError { return String(error.prefix(80)) }
         guard let last = project.lastBuiltAt else { return "Never built — will build soon" }
         let lastStr = DateHelpers.relativeLabel(for: last)
+        if project.stuckOnOldProfile {
+            return "Built \(lastStr) · Apple reused old profile — try again later or rebuild in Xcode"
+        }
         if let expiry = project.expiryLabel {
             return "Built \(lastStr) · \(expiry)"
         }
