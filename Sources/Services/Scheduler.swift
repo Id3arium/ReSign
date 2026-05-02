@@ -24,7 +24,7 @@ final class Scheduler {
         Task { await checkDueProjects() }
 
         // Hourly checks
-        timer = Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 7200, repeats: true) { [weak self] _ in
             guard let self else { return }
             Task { await self.checkDueProjects() }
         }

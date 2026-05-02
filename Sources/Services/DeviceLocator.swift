@@ -52,7 +52,11 @@ enum DeviceLocator {
             process.terminationHandler = { p in
                 let out = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
                 let err = String(data: errorPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-                continuation.resume(returning: (output: out, exitCode: p.terminationStatus))
+                // Merge stderr into output on failure so callers surface a real
+                // error message (e.g. "No devices found", devicectl crashes)
+                // instead of a silent empty string.
+                let combined = p.terminationStatus == 0 ? out : (out + err)
+                continuation.resume(returning: (output: combined, exitCode: p.terminationStatus))
             }
             try? process.run()
         }
