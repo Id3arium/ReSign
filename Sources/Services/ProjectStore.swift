@@ -20,8 +20,11 @@ final class ProjectStore {
 
     /// Re-scans for projects, merging new ones in and preserving existing state.
     func refresh() throws {
-        let path = UserDefaults.standard.string(forKey: "scanPath")
-            ?? ProjectDiscovery.defaultScanPath
+        guard let path = UserDefaults.standard.string(forKey: "scanPath"), !path.isEmpty else {
+            projects = []
+            save()
+            return
+        }
         let scanRoot = URL(filePath: path)
         let discovered = try ProjectDiscovery.discoverProjects(in: scanRoot)
 
@@ -30,11 +33,11 @@ final class ProjectStore {
 
         // Keep existing state for known projects, add new ones
         var updated: [ManagedProject] = []
-        for discovered in discovered {
-            if let existing = projects.first(where: { $0.name == discovered.name }) {
+        for disc in discovered {
+            if let existing = projects.first(where: { $0.name == disc.name }) {
                 updated.append(existing)
             } else {
-                updated.append(discovered)
+                updated.append(disc)
             }
         }
         projects = updated
@@ -42,7 +45,7 @@ final class ProjectStore {
     }
 
     func markBuildStarted(id: UUID) {
-        update(id: id) { $0.isBuilding = true; $0.lastError = nil; $0.buildPhase = "Starting..." }
+        update(id: id) { $0.isBuilding = true; $0.buildPhase = "Starting..." }
     }
 
     func markBuildSucceeded(id: UUID, profileExpiresAt: Date? = nil) {
@@ -95,6 +98,6 @@ final class ProjectStore {
     private func load() {
         guard let data = try? Data(contentsOf: storeURL),
               let saved = try? JSONDecoder().decode([ManagedProject].self, from: data) else { return }
-        projects = saved
+        projects = saved.filter { ProjectDiscovery.isIOSProject(xcodeprojURL: $0.projectPath) }
     }
 }

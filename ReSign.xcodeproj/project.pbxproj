@@ -25,6 +25,7 @@
 		RS0029 /* BuildLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0030 /* BuildLogStore.swift */; };
 		RS0031 /* SigningStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0032 /* SigningStatus.swift */; };
 		RS0033 /* BuildOutputFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0034 /* BuildOutputFilter.swift */; };
+		RS0035 /* LoginItemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = RS0036 /* LoginItemManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		RS0030 /* BuildLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildLogStore.swift; sourceTree = "<group>"; };
 		RS0032 /* SigningStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigningStatus.swift; sourceTree = "<group>"; };
 		RS0034 /* BuildOutputFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildOutputFilter.swift; sourceTree = "<group>"; };
+		RS0036 /* LoginItemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemManager.swift; sourceTree = "<group>"; };
 		RS0060 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		RS0061 /* ReSign.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ReSign.entitlements; sourceTree = "<group>"; };
 		RS0070 /* ReSign.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReSign.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -114,6 +116,7 @@
 				RS0030 /* BuildLogStore.swift */,
 				RS0032 /* SigningStatus.swift */,
 				RS0034 /* BuildOutputFilter.swift */,
+				RS0036 /* LoginItemManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -231,6 +234,7 @@
 				RS0029 /* BuildLogStore.swift in Sources */,
 				RS0031 /* SigningStatus.swift in Sources */,
 				RS0033 /* BuildOutputFilter.swift in Sources */,
+				RS0035 /* LoginItemManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

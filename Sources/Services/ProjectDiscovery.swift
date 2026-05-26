@@ -1,7 +1,6 @@
 import Foundation
 
 enum ProjectDiscovery {
-    static let defaultScanPath = "/Users/alejandro/Projects/Code/iOS"
     static let excludedNames: Set<String> = ["ReSign"]
 
     static func discoverProjects(in scanRoot: URL) throws -> [ManagedProject] {
@@ -34,7 +33,7 @@ enum ProjectDiscovery {
     /// Returns false for macOS-only projects (SDKROOT = macosx).
     /// Returns true as a permissive default if the pbxproj can't be read,
     /// so we don't silently drop valid projects on an unexpected format.
-    private static func isIOSProject(xcodeprojURL: URL) -> Bool {
+    static func isIOSProject(xcodeprojURL: URL) -> Bool {
         let pbxprojURL = xcodeprojURL.appendingPathComponent("project.pbxproj")
         guard let contents = try? String(contentsOf: pbxprojURL, encoding: .utf8) else {
             return true

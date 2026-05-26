@@ -70,7 +70,9 @@ struct MenuBarView: View {
     @ViewBuilder
     private var projectList: some View {
         if store.projects.isEmpty {
-            Text("No iOS projects found in\n\(UserDefaults.standard.string(forKey: "scanPath") ?? ProjectDiscovery.defaultScanPath)")
+            Text(UserDefaults.standard.string(forKey: "scanPath")?.isEmpty == false
+                 ? "No iOS projects found in\n\(UserDefaults.standard.string(forKey: "scanPath")!)"
+                 : "No scan path set.\nOpen Settings and choose a folder.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(12)
@@ -113,24 +115,50 @@ private struct ProjectCardRow: View {
 
     @State private var isHovered = false
 
+    private var expandedLogText: String {
+        var parts: [String] = []
+        parts.append(statusSummary)
+        if let log, !log.isEmpty {
+            parts.append(log)
+        }
+        return parts.joined(separator: "\n\n")
+    }
+
+    private var statusSummary: String {
+        if project.isBuilding { return project.buildPhase ?? "Building..." }
+        if let error = project.lastError { return error }
+        guard let last = project.lastBuiltAt else { return "Never built" }
+        let lastStr = DateHelpers.relativeLabel(for: last)
+        if let expiry = project.expiryLabel {
+            if project.stuckOnOldProfile {
+                return "Profile still valid · built \(lastStr) · \(expiry)"
+            }
+            return "Built \(lastStr) · \(expiry)"
+        }
+        return "Built \(lastStr)"
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             ProjectRowView(project: project, onBuildNow: onRebuild, onCancel: onCancel)
 
-            if isExpanded, let log, !log.isEmpty {
-                ScrollView {
-                    Text(log)
-                        .font(.system(.caption2, design: .monospaced))
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(8)
-                }
-                .frame(maxHeight: 140)
-                .background(.black.opacity(0.05))
-                .overlay(alignment: .topTrailing) {
-                    CopyLogButton(log: log)
-                        .padding(.top, 6)
-                        .padding(.trailing, 18)
+            if isExpanded {
+                let displayText = expandedLogText
+                if !displayText.isEmpty {
+                    ScrollView {
+                        Text(displayText)
+                            .font(.system(.caption2, design: .monospaced))
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(8)
+                    }
+                    .frame(maxHeight: 140)
+                    .background(.black.opacity(0.05))
+                    .overlay(alignment: .topTrailing) {
+                        CopyLogButton(log: displayText)
+                            .padding(.top, 6)
+                            .padding(.trailing, 18)
+                    }
                 }
             }
         }
@@ -226,14 +254,32 @@ private struct HoverButton: View {
 
 private struct SettingsPanel: View {
     @Environment(ProjectStore.self) private var store
-    @AppStorage("scanPath") private var scanPath = ProjectDiscovery.defaultScanPath
+    @AppStorage("scanPath") private var scanPath = ""
     @AppStorage("selectedDeviceID") private var selectedDeviceID = ""
     @State private var devices: [DeviceInfo] = []
     @State private var isLoadingDevices = false
+    @State private var launchAtLogin = LoginItemManager.isEnabled
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                // Launch at login
+                HStack {
+                    Text("Launch ReSign at login")
+                        .controlSize(.small)
+                    Spacer()
+                    Toggle("", isOn: $launchAtLogin)
+                        .toggleStyle(.switch)
+                        .controlSize(.mini)
+                        .labelsHidden()
+                        .onChange(of: launchAtLogin) { _, newValue in
+                            try? LoginItemManager.setEnabled(newValue)
+                            launchAtLogin = LoginItemManager.isEnabled
+                        }
+                }
+
+                Divider()
+
                 // Scan path
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Scan Path")
@@ -248,7 +294,14 @@ private struct SettingsPanel: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
 
                         Button("Change") { pickFolder() }
-                            .controlSize(.mini)
+                            .buttonStyle(.plain)
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                RoundedRectangle(cornerRadius: 5)
+                                    .strokeBorder(Color.primary.opacity(0.25), lineWidth: 0.5)
+                            )
                     }
                 }
 

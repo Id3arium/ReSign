@@ -90,6 +90,9 @@ final class BuildOutputFilter {
             return nil
         }
 
+        // Drop individual noise lines that don't start continuation blocks.
+        if shouldDropLine(trimmed) { return nil }
+
         // Unknown content at column 0 that isn't recognized noise — keep it.
         // Better to let an occasional odd line through than swallow a real error.
         if line.first?.isWhitespace != true {
@@ -101,10 +104,13 @@ final class BuildOutputFilter {
     }
 
     private func shouldAlwaysKeep(_ trimmed: String) -> Bool {
-        // Error / warning / note lines from the compiler and linker.
+        // Error / warning lines from the compiler and linker.
         if trimmed.contains("error:") { return true }
-        if trimmed.contains("warning:") { return true }
-        if trimmed.contains("note:") { return true }
+        if trimmed.contains("warning:") {
+            // Drop noisy tool warnings that aren't actionable.
+            if trimmed.contains("Metadata extraction skipped") { return false }
+            return true
+        }
 
         // BuildRunner's own phase markers.
         if trimmed.hasPrefix("===") { return true }
@@ -117,14 +123,7 @@ final class BuildOutputFilter {
 
         // Device / signing / install context.
         if trimmed.hasPrefix("Device:") { return true }
-        if trimmed.hasPrefix("Signing Identity:") { return true }
-        if trimmed.hasPrefix("Provisioning Profile:") { return true }
-        if trimmed.hasPrefix("App installed") { return true }
-        if trimmed.hasPrefix("Acquired ") { return true }
-        if trimmed.hasPrefix("Enabling developer disk image") { return true }
-
-        // The xcodebuild invocation line (once) is useful to reproduce manually.
-        if trimmed.hasPrefix("Command line invocation:") { return true }
+        if trimmed.hasPrefix("App installed:") { return true }
 
         return false
     }
@@ -173,24 +172,75 @@ final class BuildOutputFilter {
             "Touch ",
             "Build description signature:",
             "Build description path:",
+            "SwiftExplicitDependencyGeneratePcm",
         ]
         return droppedPrefixes.contains { trimmed.hasPrefix($0) }
     }
 
-    /// Turns a SwiftCompile header into a short "Compiling Foo.swift" line.
-    /// Input looks like: `SwiftCompile normal arm64 /path/to/Foo.swift (in target ...)`
-    /// Or:               `SwiftCompile normal arm64 Compiling\ A.swift,\ B.swift ...`
+    /// Individual lines to drop (not step headers — these don't start continuation blocks).
+    private func shouldDropLine(_ trimmed: String) -> Bool {
+        if trimmed.hasPrefix("/*") { return true }
+        if trimmed.hasPrefix("note:") { return true }
+        if trimmed.hasPrefix("Signing Identity:") { return true }
+        if trimmed.hasPrefix("Provisioning Profile:") { return true }
+        if trimmed.hasPrefix("Command line invocation:") { return true }
+        if trimmed.hasPrefix("Acquired ") { return true }
+        if trimmed.hasPrefix("Enabling developer disk image") { return true }
+        if trimmed.hasPrefix("• ") { return true }
+        if trimmed.contains("appintentsmetadataprocessor") { return true }
+        if trimmed.contains("appintentsnltrainingprocessor") { return true }
+        if trimmed.contains("No AppShortcuts found") { return true }
+        if trimmed.contains("No AppIntents.framework") { return true }
+        if trimmed.contains("stub executor") { return true }
+        if trimmed.hasPrefix("}") && trimmed.count <= 2 { return true }
+        // Drop DerivedData paths that leak through as actool output.
+        if trimmed.contains("/DerivedData/") && !trimmed.contains("error:") { return true }
+        return false
+    }
+
+    /// Extracts only error-relevant lines from a filtered build log.
+    /// Use this to show a minimal log when a build fails — strips successful
+    /// compile steps and phase markers, keeps errors, warnings, and context.
+    /// Minimal summary for a successful build — just the outcome lines.
+    static func extractSuccess(from log: String) -> String {
+        let lines = log.components(separatedBy: "\n")
+        let result = lines.filter { line in
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.isEmpty { return false }
+            if trimmed.contains("** BUILD SUCCEEDED **") { return true }
+            if trimmed.contains("** CLEAN SUCCEEDED **") { return true }
+            if trimmed.hasPrefix("App installed") { return true }
+            if trimmed.hasPrefix("Device:") { return true }
+            if trimmed.contains("warning:") { return true }
+            return false
+        }
+        return result.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Extracts only error-relevant lines from a filtered build log.
+    static func extractErrors(from log: String) -> String {
+        let lines = log.components(separatedBy: "\n")
+        let result = lines.filter { line in
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.isEmpty { return false }
+            return trimmed.contains("error:") || trimmed.contains("warning:")
+        }
+        let extracted = result.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+        return extracted.isEmpty ? log : extracted
+    }
+
+    /// Turns a SwiftCompile header into a short "Compiling Foo.swift, Bar.swift" line.
     private func summarizeSwiftCompile(_ trimmed: String) -> String? {
-        // We only care about the batch headers (the "Compiling A.swift, B.swift" form)
-        // since the per-file lines are redundant. Drop per-file, keep batch.
         if trimmed.contains("Compiling\\") || trimmed.contains("Compiling ") {
-            // Extract the "A.swift, B.swift, C.swift" part.
             if let range = trimmed.range(of: "Compiling\\ ") ?? trimmed.range(of: "Compiling ") {
                 let rest = String(trimmed[range.upperBound...])
-                // Trim off the " (in target ...)" suffix if present.
-                let files = rest.components(separatedBy: " (in target").first ?? rest
-                let cleaned = files.replacingOccurrences(of: "\\", with: "")
-                return "Compiling \(cleaned)"
+                let cleaned = rest.replacingOccurrences(of: "\\", with: "")
+                // Strip full paths that follow the file names.
+                // Format: "A.swift, B.swift /full/path/A.swift /full/path/B.swift"
+                // Keep only the comma-separated names before the first absolute path.
+                let parts = cleaned.components(separatedBy: " /")
+                let names = parts[0].components(separatedBy: " (in target").first ?? parts[0]
+                return "Compiling \(names.trimmingCharacters(in: .whitespaces))"
             }
         }
         return nil

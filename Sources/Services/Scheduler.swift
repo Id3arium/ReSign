@@ -138,17 +138,19 @@ final class Scheduler {
                 self.inFlight.removeValue(forKey: projectID)
                 self.pendingRetry.remove(projectID)
 
-                // Always save the log, even on cancel
-                self.logStore?.save(log: log, for: projectID, name: projectName)
-
                 switch result {
                 case .success(_, let profileExpiresAt):
+                    let displayLog = BuildOutputFilter.extractSuccess(from: log)
+                    self.logStore?.save(log: displayLog, for: projectID, name: projectName)
                     store.markBuildSucceeded(id: projectID, profileExpiresAt: profileExpiresAt)
                     notifications.sendSuccessNotification(project: project)
                 case .failure(let phase, let message):
+                    let displayLog = BuildOutputFilter.extractErrors(from: log)
+                    self.logStore?.save(log: displayLog, for: projectID, name: projectName)
                     store.markBuildFailed(id: projectID, error: "\(phase.rawValue): \(message)")
                     notifications.sendFailureNotification(project: project, message: message)
                 case .cancelled:
+                    self.logStore?.save(log: log, for: projectID, name: projectName)
                     store.markBuildCancelled(id: projectID)
                 }
             }

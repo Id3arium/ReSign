@@ -7,6 +7,8 @@ enum DateHelpers {
     }
 
     static func relativeLabel(for date: Date) -> String {
+        let seconds = Date.now.timeIntervalSince(date)
+        if abs(seconds) < 60 { return "just now" }
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: .now)
