@@ -8,6 +8,13 @@ struct ReSignApp: App {
     @State private var notifications = NotificationManager()
     @State private var didStart = false
 
+    init() {
+        // Re-assert the login-item registration if the user wanted it but the
+        // OS dropped it (reinstall / OS update). Done here rather than in the
+        // MenuBarExtra label's .task, which doesn't reliably fire on macOS 26.
+        LoginItemManager.reconcile()
+    }
+
     var body: some Scene {
         MenuBarExtra {
             MenuBarView(scheduler: scheduler)

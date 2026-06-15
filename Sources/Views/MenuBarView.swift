@@ -282,7 +282,9 @@ private struct SettingsPanel: View {
     @AppStorage("selectedDeviceID") private var selectedDeviceID = ""
     @State private var devices: [DeviceInfo] = []
     @State private var isLoadingDevices = false
-    @State private var launchAtLogin = LoginItemManager.isEnabled
+    // Reflect the saved intent (persists across reinstalls), falling back to
+    // live OS status so a freshly-registered item still reads as on.
+    @State private var launchAtLogin = LoginItemManager.wantsLaunchAtLogin || LoginItemManager.isEnabled
     @State private var contentHeight: CGFloat = 0
 
     var body: some View {
@@ -299,7 +301,9 @@ private struct SettingsPanel: View {
                         .labelsHidden()
                         .onChange(of: launchAtLogin) { _, newValue in
                             try? LoginItemManager.setEnabled(newValue)
-                            launchAtLogin = LoginItemManager.isEnabled
+                            // Reflect saved intent: setEnabled persisted it even
+                            // if the OS registration call is briefly out of sync.
+                            launchAtLogin = LoginItemManager.wantsLaunchAtLogin
                         }
                 }
 
