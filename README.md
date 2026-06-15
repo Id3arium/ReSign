@@ -37,10 +37,10 @@ ReSign scans one level deep inside the projects folder, looking for `ProjectName
 ## Build from source
 
 ```bash
-./build.sh --install   # Release build, installs to /Applications and launches
+./build.sh   # Release build, installs to /Applications/_vibe_coded and launches
 ```
 
-For development iteration, plain `./build.sh` does a Debug build and runs from `./build/` without touching `/Applications`.
+For development iteration, `./build.sh --fast` does a Debug build and runs from `./build/` without touching `/Applications`.
 
 ## License
 
