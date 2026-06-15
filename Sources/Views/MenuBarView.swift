@@ -8,6 +8,7 @@ struct MenuBarView: View {
 
     @State private var showSettings = false
     @State private var expandedLogID: UUID?
+    @State private var projectListContentHeight: CGFloat = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -79,6 +80,11 @@ struct MenuBarView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         } else {
             let allLogs = logStore.logs
+            // Measure the content's natural height so the ScrollView can size
+            // to fit (showing all cards without scrolling) up to a 320pt cap.
+            // macOS 26 collapses a ScrollView that has only a maxHeight to zero
+            // height inside MenuBarExtra(.window), so we drive the height from
+            // the measured content instead of relying on maxHeight alone.
             ScrollView {
                 VStack(spacing: 0) {
                     ForEach(store.projects) { project in
@@ -97,9 +103,27 @@ struct MenuBarView: View {
                         Divider()
                     }
                 }
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear
+                            .preference(key: ContentHeightKey.self, value: proxy.size.height)
+                    }
+                )
             }
-            .frame(maxHeight: 320)
+            // Clamp into [44, 320]: never collapse to zero before the first
+            // measurement arrives, never grow past the cap (scroll past that).
+            .frame(height: min(max(projectListContentHeight, 44), 320))
+            .onPreferenceChange(ContentHeightKey.self) { projectListContentHeight = $0 }
         }
+    }
+}
+
+// Measures the natural height of the project list content so the ScrollView
+// can size to fit (up to a cap) instead of collapsing to zero on macOS 26.
+private struct ContentHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
 
@@ -259,6 +283,7 @@ private struct SettingsPanel: View {
     @State private var devices: [DeviceInfo] = []
     @State private var isLoadingDevices = false
     @State private var launchAtLogin = LoginItemManager.isEnabled
+    @State private var contentHeight: CGFloat = 0
 
     var body: some View {
         ScrollView {
@@ -340,8 +365,17 @@ private struct SettingsPanel: View {
                 }
             }
             .padding(12)
+            .background(
+                GeometryReader { proxy in
+                    Color.clear
+                        .preference(key: ContentHeightKey.self, value: proxy.size.height)
+                }
+            )
         }
-        .frame(maxHeight: 260)
+        // Same macOS 26 collapse fix as the project list: size to content,
+        // clamped into [44, 260], rather than relying on maxHeight alone.
+        .frame(height: min(max(contentHeight, 44), 260))
+        .onPreferenceChange(ContentHeightKey.self) { contentHeight = $0 }
         .task { await refreshDevices() }
     }
 

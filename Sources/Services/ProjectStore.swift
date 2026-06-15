@@ -15,6 +15,9 @@ final class ProjectStore {
 
     init() {
         load()
+        // Populate synchronously at init. Under macOS 26 the .task on a
+        // MenuBarExtra label view does NOT fire, so we can't defer the initial
+        // scan there — it would leave the list permanently empty.
         try? refresh()
     }
 

@@ -2,28 +2,31 @@
 # Build ReSign.app and launch it for fast iteration.
 #
 # Usage:
-#   ./build.sh                 # fast: Debug build, run from ./build (default)
-#   ./build.sh --install       # Release build, install to /Applications, relaunch
+#   ./build.sh                 # Release build, install to /Applications, relaunch (default)
+#   ./build.sh --fast          # fast: Debug build, run from ./build (quick iteration)
 #   ./build.sh -v              # verbose xcodebuild output
 #   ./build.sh -h              # show this help
 
 set -euo pipefail
 
 APP_NAME=ReSign
-MODE=fast   # fast | install
+MODE=install   # install | fast
 VERBOSE=0
+# Self-built apps live separately from App Store / internet downloads.
+INSTALL_DIR="/Applications/_vibe_coded"
 
 for arg in "$@"; do
     case "$arg" in
-        --install)       MODE=install ;;
+        --fast|--dev)    MODE=fast ;;
+        --install)       MODE=install ;;  # kept for back-compat; now the default
         -v|--verbose)    VERBOSE=1 ;;
         -h|--help)
             cat <<'EOF'
-Build ReSign.app and launch it for fast iteration.
+Build ReSign.app and launch it.
 
 Usage:
-  ./build.sh                 fast: Debug build, run from ./build (default)
-  ./build.sh --install       Release build, install to /Applications, relaunch
+  ./build.sh                 Release build, install to /Applications, relaunch (default)
+  ./build.sh --fast          fast: Debug build, run from ./build (quick iteration)
   ./build.sh -v              verbose xcodebuild output
   ./build.sh -h              show this help
 EOF
@@ -157,11 +160,12 @@ else
         exit 1
     fi
 
-    echo "→ Installing to /Applications/$APP_NAME.app"
-    rm -rf "/Applications/$APP_NAME.app"
-    cp -R "$OUT_DIR/$APP_NAME.app" /Applications/
+    echo "→ Installing to $INSTALL_DIR/$APP_NAME.app"
+    mkdir -p "$INSTALL_DIR"
+    rm -rf "$INSTALL_DIR/$APP_NAME.app"
+    cp -R "$OUT_DIR/$APP_NAME.app" "$INSTALL_DIR/"
 
     echo "→ Launching..."
-    open "/Applications/$APP_NAME.app"
-    echo "✓ $APP_NAME running from /Applications. Check the menu bar."
+    open "$INSTALL_DIR/$APP_NAME.app"
+    echo "✓ $APP_NAME running from $INSTALL_DIR. Check the menu bar."
 fi
