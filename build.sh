@@ -10,16 +10,17 @@
 set -euo pipefail
 
 APP_NAME=ReSign
-MODE=install   # install | fast
+MODE=install   # install | fast | noinstall
 VERBOSE=0
 # Self-built apps live separately from App Store / internet downloads.
 INSTALL_DIR="/Applications/_vibe_coded"
 
 for arg in "$@"; do
     case "$arg" in
-        --fast|--dev)    MODE=fast ;;
-        --install)       MODE=install ;;  # kept for back-compat; now the default
-        -v|--verbose)    VERBOSE=1 ;;
+        --fast|--dev)        MODE=fast ;;
+        --install)           MODE=install ;;  # kept for back-compat; now the default
+        -n|--no-install)     MODE=noinstall ;;
+        -v|--verbose)        VERBOSE=1 ;;
         -h|--help)
             cat <<'EOF'
 Build ReSign.app and launch it.
@@ -27,6 +28,7 @@ Build ReSign.app and launch it.
 Usage:
   ./build.sh                 Release build, install to /Applications, relaunch (default)
   ./build.sh --fast          fast: Debug build, run from ./build (quick iteration)
+  ./build.sh --no-install    Release build, stage into ./build, no install/launch (for release.sh)
   ./build.sh -v              verbose xcodebuild output
   ./build.sh -h              show this help
 EOF
@@ -125,12 +127,17 @@ if [ "$MODE" = "fast" ]; then
     open "$APP_PATH"
     echo "✓ $APP_NAME running from ./build. Check the menu bar."
 else
-    # Install mode: stage, quit any running copy, replace /Applications, relaunch.
+    # Install / no-install mode: stage the fresh build into ./build first.
     OUT_DIR="build"
     mkdir -p "$OUT_DIR"
     rm -rf "$OUT_DIR/$APP_NAME.app"
     cp -R "$APP_PATH" "$OUT_DIR/"
     echo "✓ Staged: $OUT_DIR/$APP_NAME.app"
+
+    # no-install: stop here with the artifact staged (used by release.sh).
+    if [ "$MODE" = "noinstall" ]; then
+        exit 0
+    fi
 
     echo "→ Stopping any running $APP_NAME..."
     osascript -e "tell application \"$APP_NAME\" to quit" 2>/dev/null || true
