@@ -211,6 +211,9 @@ final class BuildOutputFilter {
             if trimmed.contains("** CLEAN SUCCEEDED **") { return true }
             if trimmed.hasPrefix("App installed") { return true }
             if trimmed.hasPrefix("Device:") { return true }
+            // Keep the builder marker so the summary shows whether the project's
+            // own build.sh ran or ReSign's built-in xcodebuild did.
+            if trimmed.hasPrefix("Builder:") { return true }
             if trimmed.contains("warning:") { return true }
             return false
         }

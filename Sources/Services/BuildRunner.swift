@@ -26,6 +26,22 @@ enum BuildRunner {
             return (.failure(phase: .deviceNotFound, message: error.localizedDescription), fullLog.value)
         }
 
+        // Phase 1.5: If the project root ships a build.sh, prefer it. The script
+        // owns build+sign+install (and likely knows project-specific steps like
+        // xcodegen). We pass the chosen device so it installs to the right phone,
+        // then verify it staged a signed .app we can read expiry from. If the
+        // script doesn't produce one (e.g. an old unsigned-IPA script), we fall
+        // through to ReSign's own xcodebuild path rather than mis-scheduling.
+        if let buildScript = projectBuildScript(for: project) {
+            do { try Task.checkCancellation() } catch { return (.cancelled, fullLog.value) }
+            if let delegated = await runProjectBuildScript(
+                buildScript, project: project, deviceID: device.id, append: append
+            ) {
+                return (delegated, fullLog.value)
+            }
+            append("\n(build.sh did not produce a signed .app — falling back to xcodebuild)\n\n")
+        }
+
         // Phase 2: xcodebuild
         do {
             try Task.checkCancellation()
@@ -41,6 +57,7 @@ enum BuildRunner {
             return (.failure(phase: .xcodebuild, message: "Could not create build output directory at \(derivedDataDir.path). Check disk permissions."), fullLog.value)
         }
 
+        append("Builder: xcodebuild (built-in)\n")
         append("=== xcodebuild ===\n")
         let buildResult: (output: String, exitCode: Int32)
         do {
@@ -105,6 +122,69 @@ enum BuildRunner {
     }
 
     // MARK: - Private
+
+    /// An executable `build.sh` at the project repo root (the .xcodeproj's parent
+    /// directory), or nil if absent / not executable.
+    private static func projectBuildScript(for project: ManagedProject) -> URL? {
+        let script = project.projectPath
+            .deletingLastPathComponent()
+            .appendingPathComponent("build.sh")
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: script.path),
+              fm.isExecutableFile(atPath: script.path) else { return nil }
+        return script
+    }
+
+    /// Runs the project's build.sh with the target device, then looks for a
+    /// signed `build/<Name>.app` it staged. Returns a `.success`/`.failure`
+    /// BuildResult if the delegation is conclusive, or nil to signal "fall back
+    /// to ReSign's own xcodebuild" (script ran but staged no signed .app).
+    private static func runProjectBuildScript(
+        _ script: URL,
+        project: ManagedProject,
+        deviceID: String,
+        append: @Sendable @escaping (String) -> Void
+    ) async -> BuildResult? {
+        append("Builder: build.sh (\(script.path))\n")
+        append("=== build.sh ===\n")
+        let repoRoot = script.deletingLastPathComponent()
+
+        let result: (output: String, exitCode: Int32)
+        do {
+            // Pass the chosen device so the script installs to the right phone.
+            // Scripts that don't recognize --device should ignore unknown flags;
+            // if one hard-fails on it, the staged-.app check below still gates us.
+            result = try await run(
+                ["bash", script.path, "--device", deviceID],
+                cwd: repoRoot,
+                onOutput: append
+            )
+        } catch is CancellationError {
+            return .cancelled
+        } catch {
+            // Couldn't even launch the script — fall back to xcodebuild.
+            return nil
+        }
+
+        // Verify: a build.sh-built app is staged at build/<Name>.app and carries
+        // an embedded provisioning profile (i.e. it was actually signed).
+        let stagedApp = repoRoot
+            .appendingPathComponent("build", isDirectory: true)
+            .appendingPathComponent("\(project.name).app", isDirectory: true)
+        let profile = stagedApp.appendingPathComponent("embedded.mobileprovision")
+        guard FileManager.default.fileExists(atPath: stagedApp.path),
+              FileManager.default.fileExists(atPath: profile.path) else {
+            // No signed .app to read expiry from — let the caller fall back.
+            return nil
+        }
+
+        guard result.exitCode == 0 else {
+            return .failure(phase: .xcodebuild, message: classifyBuildError(result.output))
+        }
+
+        let expiry = readProfileExpiry(appPath: stagedApp)
+        return .success(appBundlePath: stagedApp, profileExpiresAt: expiry)
+    }
 
     private static func readProfileExpiry(appPath: URL) -> Date? {
         let profilePath = appPath.appendingPathComponent("embedded.mobileprovision")
@@ -180,11 +260,13 @@ enum BuildRunner {
 
     private static func run(
         _ arguments: [String],
+        cwd: URL? = nil,
         onOutput: @Sendable @escaping (String) -> Void
     ) async throws -> (output: String, exitCode: Int32) {
         let process = Process()
         process.executableURL = URL(filePath: "/usr/bin/env")
         process.arguments = arguments
+        if let cwd { process.currentDirectoryURL = cwd }
 
         let stdoutPipe = Pipe()
         let stderrPipe = Pipe()
