@@ -28,9 +28,9 @@ enum ProjectDiscovery {
         }
     }
 
-    /// Inspects `project.pbxproj` for an `iphoneos` SDKROOT.
-    /// Returns true if any build configuration targets iOS.
-    /// Returns false for macOS-only projects (SDKROOT = macosx).
+    /// Inspects `project.pbxproj` to decide whether the project targets iOS.
+    /// Returns true if SDKROOT (or, failing that, SUPPORTED_PLATFORMS) names
+    /// `iphoneos`. Returns false for macOS-only projects (SDKROOT = macosx).
     /// Returns true as a permissive default if the pbxproj can't be read,
     /// so we don't silently drop valid projects on an unexpected format.
     static func isIOSProject(xcodeprojURL: URL) -> Bool {
@@ -38,15 +38,19 @@ enum ProjectDiscovery {
         guard let contents = try? String(contentsOf: pbxprojURL, encoding: .utf8) else {
             return true
         }
-        // Look for SDKROOT assignments. Typical forms:
-        //   SDKROOT = iphoneos;
-        //   SDKROOT = macosx;
-        if contents.contains("SDKROOT = iphoneos") { return true }
-        if contents.contains("SDKROOT = macosx") { return false }
-        // Fallback: check SUPPORTED_PLATFORMS if SDKROOT isn't explicit.
-        if contents.contains("iphoneos") && !contents.contains("SDKROOT = macosx") {
-            return true
-        }
+        // Match build-setting assignments as real tokens rather than bare
+        // substrings, tolerating whitespace and optional quotes:
+        //   SDKROOT = iphoneos;   SDKROOT = "iphoneos";   SDKROOT=iphoneos;
+        if matches(#"SDKROOT\s*=\s*"?iphoneos"?"#, in: contents) { return true }
+        if matches(#"SDKROOT\s*=\s*"?macosx"?"#, in: contents) { return false }
+        // No explicit SDKROOT: fall back to SUPPORTED_PLATFORMS containing
+        // iphoneos as a whole word (e.g. xcodegen projects like Almanac).
+        if matches(#"SUPPORTED_PLATFORMS\s*=[^;]*\biphoneos\b"#, in: contents) { return true }
         return false
+    }
+
+    /// Whether `pattern` (a regex) matches anywhere in `text`.
+    private static func matches(_ pattern: String, in text: String) -> Bool {
+        text.range(of: pattern, options: .regularExpression) != nil
     }
 }
